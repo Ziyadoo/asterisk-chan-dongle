@@ -1,3 +1,5 @@
+.vs
+
 *.swp
 
 *.o
@@ -19,3 +21,6 @@
 /missing
 /stamp-h
 /stamp-h1
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+.vs/asterisk-chan-dongle/v16/.suo
