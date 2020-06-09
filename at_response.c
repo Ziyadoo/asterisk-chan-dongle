@@ -360,8 +360,8 @@ static int at_response_error (struct pvt* pvt, at_res_t res)
 				goto e_return;
 
 			case CMD_AT_CIMI:
-				ast_log (LOG_ERROR, "[%s] Getting IMSI number failed\n", PVT_ID(pvt));
-				goto e_return;
+				ast_debug (1, "[%s] Getting IMSI number failed\n", PVT_ID(pvt));
+				break;
 
 			case CMD_AT_CPIN:
 				ast_log (LOG_ERROR, "[%s] Error checking PIN state\n", PVT_ID(pvt));
