@@ -98,6 +98,62 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 	return CLI_SUCCESS;
 }
 
+
+static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	struct pvt* pvt;
+
+#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle show devices";
+			e->usage   =	"Usage: dongle show devices\n"
+					"       Shows the state of Dongle devices.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			return NULL;
+	}
+
+	if (a->argc != 3)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number");
+
+	AST_RWLIST_RDLOCK (&gpublic->devices);
+	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
+	{
+		ast_mutex_lock (&pvt->lock);
+		ast_cli (a->fd, FORMAT2,
+			PVT_ID(pvt),
+			CONF_SHARED(pvt, group),
+			pvt_str_state(pvt),
+			pvt->rssi,
+			pvt->linkmode,
+			pvt->linksubmode,
+			pvt->provider_name,
+			pvt->model,
+			pvt->firmware,
+			pvt->imei,
+			pvt->imsi,
+			pvt->subscriber_number
+		);
+		ast_mutex_unlock (&pvt->lock);
+	}
+	AST_RWLIST_UNLOCK (&gpublic->devices);
+
+#undef FORMAT1
+#undef FORMAT2
+
+	return CLI_SUCCESS;
+}
+
+
 static char* cli_show_device_settings (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
 	struct pvt* pvt;
@@ -911,6 +967,7 @@ static char * cli_discovery(struct ast_cli_entry * e, int cmd, struct ast_cli_ar
 
 static struct ast_cli_entry cli[] = {
 	AST_CLI_DEFINE (cli_show_devices,	"Show Dongle devices state"),
+	AST_CLI_DEFINE (cli_show_custom,	"Show Dongle devices custom state"),
 	AST_CLI_DEFINE (cli_show_device_settings,"Show Dongle device settings"),
 	AST_CLI_DEFINE (cli_show_device_state,	 "Show Dongle device state"),
 	AST_CLI_DEFINE (cli_show_device_statistics,"Show Dongle device statistics"),
