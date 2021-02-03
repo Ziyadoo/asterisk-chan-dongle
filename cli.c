@@ -109,9 +109,9 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 	switch (cmd)
 	{
 		case CLI_INIT:
-			e->command =	"dongle show devices";
-			e->usage   =	"Usage: dongle show devices\n"
-					"       Shows the state of Dongle devices.\n";
+			e->command =	"dongle show custom";
+			e->usage   =	"Usage: dongle show custom\n"
+					"       Shows the custom state of Dongle devices.\n";
 			return NULL;
 
 		case CLI_GENERATE:
