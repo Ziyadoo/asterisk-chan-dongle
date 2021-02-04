@@ -103,8 +103,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
-#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s %-16.16s\n"
+#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s %-16.16s\n"
 
 	switch (cmd)
 	{
@@ -123,7 +123,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number", "ASR");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
@@ -141,7 +141,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 			pvt->firmware,
 			pvt->imei,
 			pvt->imsi,
-			pvt->subscriber_number
+			pvt->subscriber_number,
+			getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]))
 		);
 		ast_mutex_unlock (&pvt->lock);
 	}
