@@ -347,7 +347,8 @@ static void disconnect_dongle (struct pvt* pvt)
 
 	ast_verb (3, "[%s] Dongle has disconnected\n", PVT_ID(pvt));
 
-	manager_event_device_status(PVT_ID(pvt), "Disconnect");
+	//manager_event_device_status(PVT_ID(pvt), "Disconnect");
+	manager_event_device_fullstatus(PVT_ID(pvt));
 }
 
 
@@ -633,7 +634,8 @@ static void pvt_start(struct pvt * pvt)
 
 	pvt->connected = 1;
 	pvt->current_state = DEV_STATE_STARTED;
-	manager_event_device_status(PVT_ID(pvt), "Connect");
+	//manager_event_device_status(PVT_ID(pvt), "Connect");
+	manager_event_device_fullstatus(PVT_ID(pvt));
 	ast_verb(3, "[%s] Dongle has connected, initializing...\n", PVT_ID(pvt));
 	return;
 
@@ -788,7 +790,8 @@ EXPORT_DEF void pvt_on_create_1st_channel(struct pvt* pvt)
 	pvt->dtmf_end_time.tv_sec = 0;
 	pvt->dtmf_end_time.tv_usec = 0;
 
-	manager_event_device_status(PVT_ID(pvt), "Used");
+	//manager_event_device_status(PVT_ID(pvt), "Used");
+	manager_event_device_fullstatus(PVT_ID(pvt));
 }
 
 #/* */
@@ -799,7 +802,8 @@ EXPORT_DEF void pvt_on_remove_last_channel(struct pvt* pvt)
 		ast_timer_close(pvt->a_timer);
 		pvt->a_timer = NULL;
 	}
-	manager_event_device_status(PVT_ID(pvt), "Free");
+	//manager_event_device_status(PVT_ID(pvt), "Free");
+	manager_event_device_fullstatus(PVT_ID(pvt));
 }
 
 #define SET_BIT(dw_array,bitno)		do { (dw_array)[(bitno) >> 5] |= 1 << ((bitno) & 31) ; } while(0)

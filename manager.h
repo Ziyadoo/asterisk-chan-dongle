@@ -35,6 +35,7 @@ EXPORT_DECL void manager_event_sent_notify(const char * devname, const char * ty
 #define manager_event_cend(devname, call_index, duration, end_status, cc_cause)
 #define manager_event_call_state_change(devname, call_index, newstate)
 #define manager_event_device_status(devname, newstatus)
+#define manager_event_device_fullstatus(devname)
 #define manager_event_sent_notify(devname, type, id, result)
 
 #endif /* BUILD_MANAGER */
