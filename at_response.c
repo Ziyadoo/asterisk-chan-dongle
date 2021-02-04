@@ -200,8 +200,7 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 					pvt->timeout = DATA_READ_TIMEOUT;
 					pvt->initialized = 1;
 					ast_verb (3, "[%s] Dongle initialized and ready\n", PVT_ID(pvt));
-					//manager_event_device_status(PVT_ID(pvt), "Initialize");
-					manager_event_device_fullstatus(PVT_ID(pvt));
+					manager_event_device_status(PVT_ID(pvt), "Initialize");
 				}
 				break;
 
@@ -234,8 +233,7 @@ static int at_response_ok (struct pvt* pvt, at_res_t res)
 					pvt->timeout = DATA_READ_TIMEOUT;
 					pvt->initialized = 1;
 					ast_verb (3, "[%s] Dongle initialized and ready\n", PVT_ID(pvt));
-					//manager_event_device_status(PVT_ID(pvt), "Initialize");
-					manager_event_device_fullstatus(PVT_ID(pvt));
+					manager_event_device_status(PVT_ID(pvt), "Initialize");
 				}
 				break;
 			case CMD_AT_CHUP:
@@ -1556,14 +1554,12 @@ static int at_response_creg (struct pvt* pvt, char* str, size_t len)
 			at_enque_set_ccwa(&pvt->sys_chan, 0, 0, CONF_SHARED(pvt, callwaiting));
 //#endif
 		pvt->gsm_registered = 1;
-		//manager_event_device_status(PVT_ID(pvt), "Register");
-		manager_event_device_fullstatus(PVT_ID(pvt));
+		manager_event_device_status(PVT_ID(pvt), "Register");
 	}
 	else
 	{
 		pvt->gsm_registered = 0;
-		//manager_event_device_status(PVT_ID(pvt), "Unregister");
-		manager_event_device_fullstatus(PVT_ID(pvt));
+		manager_event_device_status(PVT_ID(pvt), "Unregister");
 	}
 
 	if (lac)

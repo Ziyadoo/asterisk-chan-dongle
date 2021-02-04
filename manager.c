@@ -391,25 +391,6 @@ EXPORT_DEF void manager_event_device_status(const char * devname, const char * n
 		);
 }
 
-#/* */
-EXPORT_DEF void manager_event_device_fullstatus(const char * devname)
-{
-	struct pvt * pvt;
-	char * str_state;
-	pvt = find_device (devname);
-	str_state = ast_str_buffer(pvt_str_state_ex(pvt));
-
-	manager_event(EVENT_FLAG_CALL, "DongleFullStatus",
-		"Device: %s\r\n"
-		"Status: %s\r\n"
-		"Signal: %d\r\n",
-		devname,
-		str_state,
-		pvt->rssi
-		);
-}
-
-
 /*!
  * \brief Send a DongleNewSMS event to the manager
  * This function splits the message in multiple lines, so multi-line
