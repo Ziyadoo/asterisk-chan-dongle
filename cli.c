@@ -169,7 +169,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 			pvt->imei,
 			pvt->imsi,
 			pvt->subscriber_number,
-			getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]))
+			getASR(PVT_STAT(find_device(PVT_ID(pvt)), out_calls), PVT_STAT(find_device (PVT_ID(pvt)), calls_answered[CALL_DIR_OUTGOING]))
 		);
 		ast_mutex_unlock (&pvt->lock);
 	}
