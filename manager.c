@@ -399,7 +399,7 @@ EXPORT_DEF void manager_event_device_fullstatus(const char * devname)
 	manager_event(EVENT_FLAG_CALL, "DongleRealStatus",
 		"Device: %s\r\n"
 		"Status: %s\r\n",
-		"Signal: %s\r\n"
+		"Signal: %s\r\n",
 		devname,
 		ast_str_buffer(pvt_str_state_ex(pvt)),
 		pvt->rssi

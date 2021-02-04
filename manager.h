@@ -20,6 +20,7 @@ EXPORT_DECL void manager_event_new_sms_base64 (const char * devname, char * numb
 EXPORT_DECL void manager_event_cend(const char * devname, int call_index, int duration, int end_status, int cc_cause);
 EXPORT_DECL void manager_event_call_state_change(const char * devname, int call_index, const char * newstate);
 EXPORT_DECL void manager_event_device_status(const char * devname, const char * newstatus);
+EXPORT_DECL void manager_event_device_fullstatus(const char * devname);
 EXPORT_DECL void manager_event_sent_notify(const char * devname, const char * type, const void * id, const char * result);
 
 #else  /* BUILD_MANAGER */
