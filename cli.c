@@ -126,7 +126,7 @@ static int32_t getASR(uint32_t total, uint32_t handled)
 }
 
 
-static char* cli_usbvoip_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
 	struct pvt* pvt;
 
@@ -136,8 +136,8 @@ static char* cli_usbvoip_show_devices (struct ast_cli_entry* e, int cmd, struct 
 	switch (cmd)
 	{
 		case CLI_INIT:
-			e->command =	"dongle usbvoip show devices";
-			e->usage   =	"Usage: dongle usbvoip show devices \n"
+			e->command =	"dongle show custom";
+			e->usage   =	"Usage: dongle show custom \n"
 					"       Shows the state of Dongle devices.\n";
 			return NULL;
 
@@ -966,7 +966,7 @@ static char * cli_discovery(struct ast_cli_entry * e, int cmd, struct ast_cli_ar
 
 static struct ast_cli_entry cli[] = {
 	AST_CLI_DEFINE (cli_show_devices,	"Show Dongle devices state"),
-	AST_CLI_DEFINE (cli_usbvoip_show_devices,	"Show Dongle devices custom state for USB VoIP"),
+	AST_CLI_DEFINE (cli_show_custom,	"Show Dongle devices custom state"),
 	AST_CLI_DEFINE (cli_show_device_settings,"Show Dongle device settings"),
 	AST_CLI_DEFINE (cli_show_device_state,	 "Show Dongle device state"),
 	AST_CLI_DEFINE (cli_show_device_statistics,"Show Dongle device statistics"),
