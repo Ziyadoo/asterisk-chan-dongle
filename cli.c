@@ -130,7 +130,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-14.14s %-10.10s %-16.16s %-16.16s %-14.14s %-6.6s %-7.7\n"
+#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-14.14s %-10.10s %-16.16s %-16.16s %-14.14s %-6.6s %-7.7s\n"
 #define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-14.14s %-10.10s %-16.16s %-16.16s %-14.14s %-6d %-7d\n"
 
 	switch (cmd)
