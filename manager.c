@@ -396,10 +396,10 @@ EXPORT_DEF void manager_event_device_fullstatus(const char * devname)
 {
 	struct pvt * pvt;
 	pvt = find_device (devname);
-	manager_event(EVENT_FLAG_CALL, "DongleRealStatus",
+	manager_event(EVENT_FLAG_CALL, "DongleFullStatus",
 		"Device: %s\r\n"
 		"Status: %s\r\n",
-		"Signal: %s\r\n",
+		"Signal: %d\r\n",
 		devname,
 		ast_str_buffer(pvt_str_state_ex(pvt)),
 		pvt->rssi
