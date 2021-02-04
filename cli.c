@@ -130,8 +130,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s %-5.5s\n"
-#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s %-4d\n"
+#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s %-6.6s %-7.7 \n"
+#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s %-4d %-5d\n"
 
 	switch (cmd)
 	{
@@ -150,7 +150,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number", "ASR");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
@@ -159,7 +159,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 		ast_cli (a->fd, FORMAT2,
 			PVT_ID(pvt),
 			CONF_SHARED(pvt, group),
-			pvt_str_state(pvt),
+			ast_str_buffer(pvt_str_state_ex(pvt)),
 			pvt->rssi,
 			pvt->linkmode,
 			pvt->linksubmode,
@@ -169,7 +169,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 			pvt->imei,
 			pvt->imsi,
 			pvt->subscriber_number,
-			getASR(PVT_STAT(find_device(PVT_ID(pvt)), out_calls), PVT_STAT(find_device (PVT_ID(pvt)), calls_answered[CALL_DIR_OUTGOING]))
+			getASR(PVT_STAT(find_device(PVT_ID(pvt)), out_calls), PVT_STAT(find_device (PVT_ID(pvt)), calls_answered[CALL_DIR_OUTGOING])),
+			getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING]))
 		);
 		ast_mutex_unlock (&pvt->lock);
 	}
