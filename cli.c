@@ -98,6 +98,33 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 	return CLI_SUCCESS;
 }
 
+#/* */
+static int32_t getACD(uint32_t calls, uint32_t duration)
+{
+	int32_t acd;
+
+	if(calls) {
+		acd = duration / calls;
+	} else {
+		acd = -1;
+	}
+
+	return acd;
+}
+
+#/* */
+static int32_t getASR(uint32_t total, uint32_t handled)
+{
+	int32_t asr;
+	if(total) {
+		asr = handled * 100 / total;
+	} else {
+		asr = -1;
+	}
+
+	return asr;
+}
+
 
 static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
@@ -302,33 +329,6 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 	}
 
 	return CLI_SUCCESS;
-}
-
-#/* */
-static int32_t getACD(uint32_t calls, uint32_t duration)
-{
-	int32_t acd;
-
-	if(calls) {
-		acd = duration / calls;
-	} else {
-		acd = -1;
-	}
-
-	return acd;
-}
-
-#/* */
-static int32_t getASR(uint32_t total, uint32_t handled)
-{
-	int32_t asr;
-	if(total) {
-		asr = handled * 100 / total;
-	} else {
-		asr = -1;
-	}
-
-	return asr;
 }
 
 static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
