@@ -150,7 +150,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Provider Name", "Model", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
