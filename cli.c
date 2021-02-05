@@ -367,7 +367,7 @@ static char* cli_show_device_custom (struct ast_cli_entry* e, int cmd, struct as
 		return CLI_SHOWUSAGE;
 	}
 
-	pvt = find_device (a->argv[5]);
+	pvt = find_device (a->argv[4]);
 	if (pvt)
 	{
 		statebuf = pvt_str_state_ex(pvt);
