@@ -130,8 +130,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n"
-#define FORMAT2 "%s;%d;%s;%d;%s;%s;%s;%s;%s%d;%d\n"
+#define FORMAT1 "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n"
+#define FORMAT2 "%s;%d;%s;%d;%s;%s;%s;%s;%s;%d;%d;%u;%u;%u;%u;%u;%u;%u;%u;%u\n"
 
 	switch (cmd)
 	{
@@ -150,7 +150,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Provider Name", "Model", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Provider Name", "Model", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT", "Calls/Channels", "Active", "Held", "Dialing", "Alerting", "Incoming", "Waiting", "Releasing", "Initializing");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
@@ -167,7 +167,16 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 			pvt->imsi,
 			pvt->subscriber_number,
 			getASR(PVT_STAT(find_device(PVT_ID(pvt)), out_calls), PVT_STAT(find_device (PVT_ID(pvt)), calls_answered[CALL_DIR_OUTGOING])),
-			getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING]))
+			getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING])),
+			PVT_STATE(pvt, chansno),
+			PVT_STATE(pvt, chan_count[CALL_STATE_ACTIVE]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_ONHOLD]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_DIALING]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_ALERTING]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_INCOMING]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_WAITING]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_RELEASED]),
+			PVT_STATE(pvt, chan_count[CALL_STATE_INIT])
 		);
 		ast_mutex_unlock (&pvt->lock);
 	}
@@ -328,6 +337,92 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 
 	return CLI_SUCCESS;
 }
+
+static char* cli_show_device_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+{
+	struct pvt* pvt;
+	struct ast_str * statebuf;
+	char buf[40];
+
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle show device custom";
+			e->usage   =	"Usage: dongle show device custom <device>\n"
+					"       Shows the custom state of Dongle device.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 4)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 6)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	pvt = find_device (a->argv[5]);
+	if (pvt)
+	{
+		statebuf = pvt_str_state_ex(pvt);
+
+		ast_cli (a->fd, "Device:%s\n", PVT_ID(pvt));
+		ast_cli (a->fd, "State:%s\n", ast_str_buffer(statebuf));
+		ast_cli (a->fd, "Audio:%s\n", PVT_STATE(pvt, audio_tty));
+		ast_cli (a->fd, "Data:%s\n", PVT_STATE(pvt, data_tty));
+		ast_cli (a->fd, "Voice:%s\n", (pvt->has_voice) ? "Yes" : "No");
+		ast_cli (a->fd, "SMS:%s\n", (pvt->has_sms) ? "Yes" : "No");
+		ast_cli (a->fd, "Manufacturer:%s\n", pvt->manufacturer);
+		ast_cli (a->fd, "Model:%s\n", pvt->model);
+		ast_cli (a->fd, "Firmware:%s\n", pvt->firmware);
+		ast_cli (a->fd, "IMEI:%s\n", pvt->imei);
+		ast_cli (a->fd, "IMSI:%s\n", pvt->imsi);
+		ast_cli (a->fd, "GsmRegistrationStatus:%s\n", GSM_regstate2str(pvt->gsm_reg_status));
+		ast_cli (a->fd, "RSSI:%d, %s\n", pvt->rssi, rssi2dBm(pvt->rssi, buf, sizeof(buf)));
+		ast_cli (a->fd, "Mode:%s\n", sys_mode2str(pvt->linkmode));
+		ast_cli (a->fd, "Submode:%s\n", sys_submode2str(pvt->linksubmode));
+		ast_cli (a->fd, "ProviderName:%s\n", pvt->provider_name);
+		ast_cli (a->fd, "LocationAreaCode:%s\n", pvt->location_area_code);
+		ast_cli (a->fd, "CellID:%s\n", pvt->cell_id);
+		ast_cli (a->fd, "SubscriberNumber:%s\n", pvt->subscriber_number);
+		ast_cli (a->fd, "SmsServiceCenter:%s\n", pvt->sms_scenter);
+		ast_cli (a->fd, "UseUCS-2Encoding:%s\n", pvt->use_ucs2_encoding ? "Yes" : "No");
+		ast_cli (a->fd, "UssdUse7BitEncoding:%s\n", pvt->cusd_use_7bit_encoding ? "Yes" : "No");
+		ast_cli (a->fd, "UssdUseUCS-2Decoding:%s\n", pvt->cusd_use_ucs2_decoding ? "Yes" : "No");
+		ast_cli (a->fd, "TasksInQueue:%u\n", PVT_STATE(pvt, at_tasks));
+		ast_cli (a->fd, "CommandsInQueue:%u\n", PVT_STATE(pvt, at_cmds));
+		ast_cli (a->fd, "CallWaiting:%s\n", pvt->has_call_waiting ? "Enabled" : "Disabled" );
+		ast_cli (a->fd, "CurrentDeviceState:%s\n", dev_state2str(pvt->current_state) );
+		ast_cli (a->fd, "DesiredDeviceState:%s\n", dev_state2str(pvt->desired_state) );
+		ast_cli (a->fd, "WhenChangeState:%s\n", restate2str_msg(pvt->restart_time) );
+
+		ast_cli (a->fd, "CallsChannels:%u\n", PVT_STATE(pvt, chansno));
+		ast_cli (a->fd, "Active:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_ACTIVE]));
+		ast_cli (a->fd, "Held:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_ONHOLD]));
+		ast_cli (a->fd, "Dialing:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_DIALING]));
+		ast_cli (a->fd, "Alerting:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_ALERTING]));
+		ast_cli (a->fd, "Incoming:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_INCOMING]));
+		ast_cli (a->fd, "Waiting:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_WAITING]));
+		ast_cli (a->fd, "Releasing:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_RELEASED]));
+		ast_cli (a->fd, "Initializing:%u\n\n", PVT_STATE(pvt, chan_count[CALL_STATE_INIT]));
+/* TODO: show call waiting  network setting and local config value */
+		ast_mutex_unlock (&pvt->lock);
+
+		ast_free(statebuf);
+	}
+	else
+	{
+		ast_cli (a->fd, "Device %s not found\n", a->argv[4]);
+	}
+
+	return CLI_SUCCESS;
+}
+
+
 
 static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
