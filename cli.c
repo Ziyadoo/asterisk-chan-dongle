@@ -1064,6 +1064,7 @@ static struct ast_cli_entry cli[] = {
 	AST_CLI_DEFINE (cli_show_custom,	"Show Dongle devices custom state"),
 	AST_CLI_DEFINE (cli_show_device_settings,"Show Dongle device settings"),
 	AST_CLI_DEFINE (cli_show_device_state,	 "Show Dongle device state"),
+	AST_CLI_DEFINE (cli_show_device_custom, "Show Dongle device custom state"),
 	AST_CLI_DEFINE (cli_show_device_statistics,"Show Dongle device statistics"),
 	AST_CLI_DEFINE (cli_show_version,	"Show module version"),
 	AST_CLI_DEFINE (cli_cmd,		"Send commands to port for debugging"),
