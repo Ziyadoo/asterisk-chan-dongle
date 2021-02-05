@@ -130,8 +130,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n"
-#define FORMAT2 "%s;%d;%s;%d;%s;%s;%s;%s;%s;%d;%d;%u;%u;%u;%u;%u;%u;%u;%u;%u\n"
+#define FORMAT1 "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n"
+#define FORMAT2 "%s;%d;%s;%s;%s;%d;%s;%s;%s;%s;%s;%d;%d;%u;%u;%u;%u;%u;%u;%u;%u;%u\n"
 
 	switch (cmd)
 	{
@@ -150,7 +150,7 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Provider Name", "Model", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT", "Calls/Channels", "Active", "Held", "Dialing", "Alerting", "Incoming", "Waiting", "Releasing", "Initializing");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "Audio", "Data", "RSSI", "Provider Name", "Model", "IMEI", "IMSI", "Number", "ASR OUT", "ACD OUT", "Calls/Channels", "Active", "Held", "Dialing", "Alerting", "Incoming", "Waiting", "Releasing", "Initializing");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
@@ -160,6 +160,8 @@ static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_a
 			PVT_ID(pvt),
 			CONF_SHARED(pvt, group),
 			ast_str_buffer(pvt_str_state_ex(pvt)),
+			PVT_STATE(pvt, audio_tty),
+			PVT_STATE(pvt, data_tty),
 			pvt->rssi,
 			pvt->provider_name,
 			pvt->model,
