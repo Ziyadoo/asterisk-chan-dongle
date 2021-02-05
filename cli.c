@@ -345,7 +345,6 @@ static char* cli_show_device_custom (struct ast_cli_entry* e, int cmd, struct as
 {
 	struct pvt* pvt;
 	struct ast_str * statebuf;
-	char buf[40];
 
 	switch (cmd)
 	{
