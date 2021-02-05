@@ -384,8 +384,8 @@ static char* cli_show_device_custom (struct ast_cli_entry* e, int cmd, struct as
 		ast_cli (a->fd, "IMEI:%s\n", pvt->imei);
 		ast_cli (a->fd, "IMSI:%s\n", pvt->imsi);
 		ast_cli (a->fd, "Number:%s\n", pvt->subscriber_number);
-		ast_cli (a->fd, "ASR_OUT:%u\n", getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING])));
-		ast_cli (a->fd, "ACD_OUT:%u\n", getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING])));
+		ast_cli (a->fd, "ASR_OUT:%d\n", getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING])));
+		ast_cli (a->fd, "ACD_OUT:%d\n", getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING])));
 		ast_cli (a->fd, "CallsChannels:%u\n", PVT_STATE(pvt, chansno));
 		ast_cli (a->fd, "Active:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_ACTIVE]));
 		ast_cli (a->fd, "Held:%u\n", PVT_STATE(pvt, chan_count[CALL_STATE_ONHOLD]));
