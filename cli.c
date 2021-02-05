@@ -378,7 +378,7 @@ static char* cli_show_device_custom (struct ast_cli_entry* e, int cmd, struct as
 		ast_cli (a->fd, "Audio:%s\n", PVT_STATE(pvt, audio_tty));
 		ast_cli (a->fd, "Data:%s\n", PVT_STATE(pvt, data_tty));
 		ast_cli (a->fd, "Manufacturer:%s\n", pvt->manufacturer);
-		ast_cli (a->fd, "RSSI:%d", pvt->rssi);
+		ast_cli (a->fd, "RSSI:%d\n", pvt->rssi);
 		ast_cli (a->fd, "ProviderName:%s\n", pvt->provider_name);
 		ast_cli (a->fd, "Model:%s\n", pvt->model);
 		ast_cli (a->fd, "IMEI:%s\n", pvt->imei);
