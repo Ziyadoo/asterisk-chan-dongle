@@ -362,7 +362,7 @@ static char* cli_show_device_custom (struct ast_cli_entry* e, int cmd, struct as
 			return NULL;
 	}
 
-	if (a->argc != 6)
+	if (a->argc != 5)
 	{
 		return CLI_SHOWUSAGE;
 	}
