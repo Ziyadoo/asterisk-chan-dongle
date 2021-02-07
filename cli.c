@@ -48,8 +48,8 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
-#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+#define FORMAT1 "%-12.12s %-5.5s %-25.25s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+#define FORMAT2 "%-12.12s %-5d %-25.25s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
 
 	switch (cmd)
 	{
@@ -98,57 +98,140 @@ static char* cli_show_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_
 	return CLI_SUCCESS;
 }
 
+#/* */
+static int32_t getACD(uint32_t calls, uint32_t duration)
+{
+	int32_t acd;
 
-static char* cli_show_custom (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
+	if(calls) {
+		acd = duration / calls;
+	} else {
+		acd = -1;
+	}
+
+	return acd;
+}
+
+#/* */
+static int32_t getASR(uint32_t total, uint32_t handled)
+{
+	int32_t asr;
+	if(total) {
+		asr = handled * 100 / total;
+	} else {
+		asr = -1;
+	}
+
+	return asr;
+}
+
+static void cli_csv_printer(struct pvt* pvt, struct ast_cli_args* a)
+{
+#define FORMAT1 "%s;%d;%s;%s;%s;%s;%d;%s;%s;%s;%s;%s;%d;%d;%u;%u;%u;%u;%u;%u;%u;%u;%u\n"
+	ast_cli (a->fd, FORMAT1,
+				PVT_ID(pvt),
+				CONF_SHARED(pvt, group),
+				ast_str_buffer(pvt_str_state_ex(pvt)),
+				PVT_STATE(pvt, audio_tty),
+				PVT_STATE(pvt, data_tty),
+				pvt->manufacturer,
+				pvt->rssi,
+				pvt->provider_name,
+				pvt->model,
+				pvt->imei,
+				pvt->imsi,
+				pvt->subscriber_number,
+				getASR(PVT_STAT(pvt, out_calls), PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING])),
+				getACD(PVT_STAT(pvt, calls_answered[CALL_DIR_OUTGOING]), PVT_STAT(pvt, calls_duration[CALL_DIR_OUTGOING])),
+				PVT_STATE(pvt, chansno),
+				PVT_STATE(pvt, chan_count[CALL_STATE_ACTIVE]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_ONHOLD]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_DIALING]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_ALERTING]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_INCOMING]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_WAITING]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_RELEASED]),
+				PVT_STATE(pvt, chan_count[CALL_STATE_INIT])
+			);
+#undef FORMAT1
+}
+
+
+static char* cli_show_csv_devices (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
 {
 	struct pvt* pvt;
 
-#define FORMAT1 "%-12.12s %-5.5s %-10.10s %-4.4s %-4.4s %-7.7s %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
-#define FORMAT2 "%-12.12s %-5d %-10.10s %-4d %-4d %-7d %-14.14s %-10.10s %-17.17s %-16.16s %-16.16s %-14.14s\n"
+#define FORMAT1 "%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n"
 
 	switch (cmd)
 	{
 		case CLI_INIT:
-			e->command =	"dongle show devices";
-			e->usage   =	"Usage: dongle show devices\n"
-					"       Shows the state of Dongle devices.\n";
+			e->command =	"dongle show csv devices";
+			e->usage   =	"Usage: dongle show csv devices \n"
+					"       Shows the state of Dongle devices as CSV seperated by ';'.\n";
 			return NULL;
 
 		case CLI_GENERATE:
 			return NULL;
 	}
 
-	if (a->argc != 3)
+	if (a->argc != 4)
 	{
 		return CLI_SHOWUSAGE;
 	}
 
-	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "RSSI", "Mode", "Submode", "Provider Name", "Model", "Firmware", "IMEI", "IMSI", "Number");
+	ast_cli (a->fd, FORMAT1, "ID", "Group", "State", "Audio", "Data", "Manufacturer", "RSSI", "ProviderName", "Model", "IMEI", "IMSI", "Number", "ASR_OUT", "ACD_OUT", "CallsChannels", "Active", "Held", "Dialing", "Alerting", "Incoming", "Waiting", "Releasing", "Initializing");
 
 	AST_RWLIST_RDLOCK (&gpublic->devices);
 	AST_RWLIST_TRAVERSE (&gpublic->devices, pvt, entry)
 	{
 		ast_mutex_lock (&pvt->lock);
-		ast_cli (a->fd, FORMAT2,
-			PVT_ID(pvt),
-			CONF_SHARED(pvt, group),
-			pvt_str_state(pvt),
-			pvt->rssi,
-			pvt->linkmode,
-			pvt->linksubmode,
-			pvt->provider_name,
-			pvt->model,
-			pvt->firmware,
-			pvt->imei,
-			pvt->imsi,
-			pvt->subscriber_number
-		);
+		cli_csv_printer (pvt, a);
 		ast_mutex_unlock (&pvt->lock);
 	}
 	AST_RWLIST_UNLOCK (&gpublic->devices);
 
 #undef FORMAT1
-#undef FORMAT2
+
+	return CLI_SUCCESS;
+}
+
+static char* cli_show_csv_device (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a) 
+{
+	struct pvt* pvt;
+	
+	switch (cmd)
+	{
+		case CLI_INIT:
+			e->command =	"dongle show csv device state";
+			e->usage   =	"Usage: dongle show csv device state <device>\n"
+					"       Shows state of Dongle device as CSV seperated by ';'.\n";
+			return NULL;
+
+		case CLI_GENERATE:
+			if (a->pos == 4)
+			{
+				return complete_device (a->word, a->n);
+			}
+			return NULL;
+	}
+
+	if (a->argc != 6)
+	{
+		return CLI_SHOWUSAGE;
+	}
+
+	pvt = find_device (a->argv[5]);
+	if (pvt)
+	{
+		cli_csv_printer (pvt, a);
+		
+		ast_mutex_unlock (&pvt->lock);
+	}
+	else
+	{
+		ast_cli (a->fd, "Device %s not found\n", a->argv[4]);
+	}
 
 	return CLI_SUCCESS;
 }
@@ -301,33 +384,6 @@ static char* cli_show_device_state (struct ast_cli_entry* e, int cmd, struct ast
 	}
 
 	return CLI_SUCCESS;
-}
-
-#/* */
-static int32_t getACD(uint32_t calls, uint32_t duration)
-{
-	int32_t acd;
-
-	if(calls) {
-		acd = duration / calls;
-	} else {
-		acd = -1;
-	}
-
-	return acd;
-}
-
-#/* */
-static int32_t getASR(uint32_t total, uint32_t handled)
-{
-	int32_t asr;
-	if(total) {
-		asr = handled * 100 / total;
-	} else {
-		asr = -1;
-	}
-
-	return asr;
 }
 
 static char* cli_show_device_statistics (struct ast_cli_entry* e, int cmd, struct ast_cli_args* a)
@@ -967,7 +1023,8 @@ static char * cli_discovery(struct ast_cli_entry * e, int cmd, struct ast_cli_ar
 
 static struct ast_cli_entry cli[] = {
 	AST_CLI_DEFINE (cli_show_devices,	"Show Dongle devices state"),
-	AST_CLI_DEFINE (cli_show_custom,	"Show Dongle devices custom state"),
+	AST_CLI_DEFINE (cli_show_csv_devices,	"Show Dongle devices state as CSV"),
+	AST_CLI_DEFINE (cli_show_csv_device, "Show Dongle device state as CSV"),
 	AST_CLI_DEFINE (cli_show_device_settings,"Show Dongle device settings"),
 	AST_CLI_DEFINE (cli_show_device_state,	 "Show Dongle device state"),
 	AST_CLI_DEFINE (cli_show_device_statistics,"Show Dongle device statistics"),

@@ -391,7 +391,6 @@ EXPORT_DEF void manager_event_device_status(const char * devname, const char * n
 		);
 }
 
-
 /*!
  * \brief Send a DongleNewSMS event to the manager
  * This function splits the message in multiple lines, so multi-line
