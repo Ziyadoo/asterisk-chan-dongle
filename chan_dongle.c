@@ -524,6 +524,7 @@ static void pvt_stop(struct pvt * pvt)
 		pvt->monitor_thread = AST_PTHREADT_NULL;
 	}
 //	pvt->current_state = DEV_STATE_STOPPED;
+	manager_event_device_status(PVT_ID(pvt), "Stopped");
 }
 
 #/* called with pvt lock hold */
